@@ -1,2 +1,2 @@
 # Pomodoro
-Following alon with Team Treehouse tutorial for JavaFX.
+Following along with Team Treehouse tutorial for JavaFX.
