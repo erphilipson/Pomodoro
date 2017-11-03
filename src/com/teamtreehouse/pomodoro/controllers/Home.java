@@ -2,12 +2,15 @@ package com.teamtreehouse.pomodoro.controllers;
 
 import com.teamtreehouse.pomodoro.model.Attempt;
 import com.teamtreehouse.pomodoro.model.AttemptKind;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 public class Home {
     @FXML private VBox container;
@@ -16,6 +19,7 @@ public class Home {
     
     private Attempt mCurrentAttempt;
     private StringProperty mTimerText;
+    private Timeline mTimeline;
     
     public Home(){
         mTimerText = new SimpleStringProperty();
@@ -47,7 +51,20 @@ public class Home {
         addAttemptStyle(kind);
         title.setText(kind.getDisplayName());
         setTimerText(mCurrentAttempt.getRemainingSeconds());
-        
+        mTimeline = new Timeline();
+        mTimeline.setCycleCount(kind.getTotalSeconds());
+        mTimeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1), e -> {
+            mCurrentAttempt.tick();
+            setTimerText(mCurrentAttempt.getRemainingSeconds());
+        }));
+    }
+    
+    public void playTimer() {
+        mTimeline.play();
+    }
+    
+    public void pauseTimer() {
+        mTimeline.pause();
     }
     
     private void addAttemptStyle(AttemptKind kind) {
@@ -58,10 +75,14 @@ public class Home {
         for (AttemptKind kind : AttemptKind.values()) {
             container.getStyleClass().remove(kind.toString().toLowerCase());
         }
-        
     }
     
     public void DEBUG(ActionEvent actionEvent) {
         System.out.println("WE DID IT!");
+    }
+    
+    public void handleRestart(ActionEvent actionEvent) {
+        prepareAttempt(AttemptKind.FOCUS);
+        playTimer();
     }
 }
